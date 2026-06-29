@@ -59,6 +59,7 @@ pub fn process_init_bank(
     bank.authority = ctx.accounts.signer.key();
     bank.liquidation_threashold = liquidation_threshold;
     bank.max_ltv = max_ltv;
+    bank.interest_rate = 0.05 as u64;
     Ok(())
 }
 
