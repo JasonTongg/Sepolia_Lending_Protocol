@@ -23,6 +23,8 @@ pub struct Bank {
     pub mint_address: Pubkey,
     pub total_deposit: u64,
     pub total_deposit_shared: u64,
+    pub total_borrowed: u64,
+    pub total_borrowed_shared: u64,
     pub liquidation_threashold: u64,
     pub liquidation_bonus: u64,
     pub liquidation_close_factor: u64,
