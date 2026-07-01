@@ -56,21 +56,21 @@ pub fn process_withdraw(ctx: Context<Withdraw>, amount: u64) -> Result<()> {
     let user = &mut ctx.accounts.user_account;
     let bank = &mut ctx.accounts.bank;
 
-    let deposited_value: u64;
+    let user_shares: u64;
     if *ctx.accounts.mint.to_account_info().key == user.usdc_address {
-        deposited_value = user.deposited_usdc;
+        user_shares = user.deposited_usdc_shares;
     } else {
-        deposited_value = user.deposited_sol;
+        user_shares = user.deposited_sol_shares;
     }
 
-    let time_dif = user.last_updated - Clock::get()?.unix_timestamp;
+    let time_dif = Clock::get()?.unix_timestamp - user.last_updated;
 
     bank.total_deposit =
-        (bank.total_deposit as f64 + E.powf(bank.interest_rate as f64 * time_dif as f64)) as u64;
+        (bank.total_deposit as f64 * E.powf(bank.interest_rate as f64 * time_dif as f64)) as u64;
 
     let value_per_share = bank.total_deposit as f64 / bank.total_deposit_shared as f64;
 
-    let user_value = deposited_value as f64 / value_per_share;
+    let user_value = user_shares as f64 * value_per_share;
 
     if user_value < amount as f64 {
         return Err(ErrorCode::InsufficientFunds.into());
@@ -78,9 +78,8 @@ pub fn process_withdraw(ctx: Context<Withdraw>, amount: u64) -> Result<()> {
 
     let mint_key = ctx.accounts.mint.key();
     let signer_seeds: &[&[&[u8]]] = &[&[
-        b"treasury".as_ref(),
         mint_key.as_ref(),
-        &[ctx.bumps.bank_token_account],
+        &[ctx.bumps.bank],
     ]];
 
     transfer_checked(

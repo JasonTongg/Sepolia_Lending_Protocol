@@ -8,4 +8,6 @@ pub enum ErrorCode {
     OverBorrowableAmount,
     #[msg("Over Repay")]
     OverRepay,
+    #[msg("NotUnderCollateralized")]
+    NotUnderCollateralized,
 }

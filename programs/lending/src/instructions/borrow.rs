@@ -98,7 +98,11 @@ pub fn process_borrow(ctx: Context<Borrow>, amount: u64) -> Result<()> {
 
     let mint = ctx.accounts.mint.key();
 
-    let signer_seeds: &[&[&[u8]]] = &[&[b"treasury".as_ref(), mint.as_ref()]];
+    let signer_seeds: &[&[&[u8]]] = &[&[
+        b"treasury".as_ref(),
+        mint.as_ref(),
+        &[ctx.bumps.bank_token_account],
+    ]];
 
     transfer_checked(
         CpiContext::new_with_signer(
@@ -141,7 +145,7 @@ pub fn process_borrow(ctx: Context<Borrow>, amount: u64) -> Result<()> {
     Ok(())
 }
 
-fn calculate_accrued_interest(
+pub fn calculate_accrued_interest(
     deposited: u64,
     interest_rate: u64,
     last_updated: i64,
